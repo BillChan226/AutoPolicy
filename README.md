@@ -84,7 +84,7 @@ The tool supports three input types:
 This example extracts policies from Reddit's rules page, follows links to related pages, and extracts rules targeting users:
 
 ```bash
-python risk_extraction_doc/policy_extractor_async.py \
+python policy_extractor_async.py \
   -d https://redditinc.com/policies/reddit-rules \
   -t html \
   -org "Reddit" \
@@ -98,7 +98,7 @@ python risk_extraction_doc/policy_extractor_async.py \
 This example extracts policies from the EU AI Act PDF, focusing on pages 2-8:
 
 ```bash
-python risk_extraction_doc/policy_extractor_async.py \
+python policy_extractor_async.py \
   -d ./policy_docs/eu_ai_act_art5.pdf \
   -t pdf \
   -org "EU AI ACT" \
@@ -123,8 +123,8 @@ python policy_extractor_async.py \
 For large documents, you can enable parallel processing of sections:
 
 ```bash
-python risk_extraction_doc/policy_extractor_async.py \
-  -d ./large_policy_document.pdf \
+python policy_extractor_async.py \
+  -d large_policy_document.pdf \
   -t pdf \
   -org "Large Organization" \
   -a 3 \
@@ -163,8 +163,8 @@ python risk_extraction_doc/policy_extractor_async.py \
 Focus extraction on specific subjects within policies:
 
 ```bash
-python risk_extraction_doc/policy_extractor_async.py \
-  -d ./platform_guidelines.pdf \
+python policy_extractor_async.py \
+  -d platform_guidelines.pdf \
   -org "Social Platform" \
   -ts "Content Creator" \
   -u "Focus on monetization policies" \

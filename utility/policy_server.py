@@ -390,12 +390,7 @@ def extract_policies_from_file(file_path: str, organization: str, organization_d
     
     # Get file info for reference
     file_info = os.path.basename(file_path)
-    
-    # Get central JSON path from environment variable
-    central_json_path = os.environ.get("POLICY_PATH")
-    if not central_json_path:
-        logger.warning("POLICY_PATH environment variable not set. Policies will only be saved locally.")
-    
+        
     system_prompt = """You are a helpful policy extraction model to identify actionable policies from organizational safety guidelines. Your task is to extract all the meaningful policies from the provided organization handbook which sets restrictions or guidelines for user or entity behaviors in this organization. You will extract specific elements from the given policies and guidelines to produce structured and actionable outputs."""
     
     user_prompt = f"""As a policy extraction model to extract and clean up useful policies from {organization} ({organization_description}), your tasks are:
