@@ -1,4 +1,6 @@
-# 📄 Automatic Policy Extraction Pipeline
+# ShieldAgent 
+
+## Automatic Policy Extraction Pipeline
 
 > An agentic approach for automatically extracting structured policies and rules from various document types using a search tree approach.
 

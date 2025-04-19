@@ -250,32 +250,44 @@ def format_risk_categories_html(categories_data):
     html += "</div>"
     return html
 
-def handle_input_type_change(input_type, file_upload, url_input):
+def handle_input_type_change(input_type):
     """Update UI based on input type selection"""
     if input_type == "html":
         return gr.update(visible=False), gr.update(visible=True)
     else:
         return gr.update(visible=True), gr.update(visible=False)
-        
-def handle_demo_selection(demo_index):
-    """Load a demo example"""
-    if demo_index < 0:
-        return [None, "", "", "", "", "", False, False]
-        
-    example = DEMO_EXAMPLES[demo_index]
+
+def load_demo_example(demo_name):
+    """Load a demo example based on name"""
+    if not demo_name:
+        return None, "", "", "", "", "", False, False
+    
+    # Find the matching example
+    example_index = -1
+    if demo_name == "Reddit Policies (HTML)":
+        example_index = 0
+    elif demo_name == "EU AI Act Article 5 (TXT)":
+        example_index = 1
+    elif demo_name == "EU AI Act Article 5 (PDF)":
+        example_index = 2
+    
+    if example_index < 0:
+        return None, "", "", "", "", "", False, False
+    
+    example = DEMO_EXAMPLES[example_index]
     document_path = example[0]
     
     # For URL demo
     if example[2] == "html":
-        return [None, document_path, example[1], example[2], example[3], example[4], example[5], example[6]]
+        return None, document_path, example[1], example[2], example[3], example[4], example[5], example[6]
     else:
-        # For file demo, return placeholder - will need to handle this specially
-        return [document_path, "", example[1], example[2], example[3], example[4], example[5], example[6]]
+        # For file demo - we'll need to handle demo file paths specially in the extraction function
+        return document_path, "", example[1], example[2], example[3], example[4], example[5], example[6]
 
 # Create the Gradio interface
 with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue")) as app:
     gr.Markdown("""
-    # 📄 Policy Extraction Tool
+    # 📄 GuardBench Policy Extraction Tool
     
     > Extract structured policies and rules from documents (PDF, HTML, TXT) using a systematic search tree approach.
     
@@ -298,7 +310,7 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue")) as app:
                 value="pdf"
             )
             
-            with gr.Row():
+            with gr.Group():
                 file_upload = gr.File(label="📎 Upload Document (PDF/TXT)")
                 url_input = gr.Textbox(label="🌐 Enter URL", visible=False)
             
@@ -338,28 +350,27 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue")) as app:
     # Set up event handlers
     input_type.change(
         handle_input_type_change,
-        inputs=[input_type, file_upload, url_input],
+        inputs=[input_type],
         outputs=[file_upload, url_input]
     )
     
     demo_dropdown.change(
-        handle_demo_selection,
-        inputs=[gr.Number(value=0, visible=False, precision=0).change(lambda x: int(x))],
+        load_demo_example,
+        inputs=[demo_dropdown],
         outputs=[file_upload, url_input, organization, input_type, page_range, user_request, deep_policy, extract_rules]
     )
     
-    # When demo dropdown changes, update the hidden demo index
-    demo_dropdown.select(
-        lambda demo: DEMO_EXAMPLES.index(demo) if demo in DEMO_EXAMPLES else -1,
-        inputs=[demo_dropdown],
-        outputs=[gr.Number(value=0, visible=False, precision=0)]
-    )
+    # Extract button handler with dynamic inputs based on input type
+    def get_document_path(file_upload, url_input, input_type):
+        if input_type == "html":
+            return url_input
+        else:
+            return file_upload
     
-    # Extract button handler
     extract_btn.click(
         run_extraction,
         inputs=[
-            file_upload if input_type.value != "html" else url_input,
+            lambda file, url, input_type=input_type: get_document_path(file, url, input_type),
             organization,
             input_type,
             page_range,
@@ -401,7 +412,23 @@ with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue")) as app:
     .rules li {
         margin-bottom: 10px;
     }
+    /* Additional styling for better UX */
+    .gradio-container {
+        max-width: 1200px !important;
+    }
+    .footer {
+        margin-top: 20px;
+        text-align: center;
+        color: #555;
+    }
     </style>
+    """)
+    
+    # Add footer
+    gr.Markdown("""
+    <div class="footer">
+        <p>GuardBench Policy Extraction Tool | © 2025</p>
+    </div>
     """)
 
 # Launch the app
