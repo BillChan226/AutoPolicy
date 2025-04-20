@@ -22,8 +22,8 @@ This tool extracts policies and rules from **PDF**, **HTML**, and **TXT** docume
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/GuardBench.git
-cd GuardBench
+git clone https://github.com/BillChan226/ShieldAgent.git
+cd ShieldAgent
 
 # Install required dependencies
 pip install -r requirements.txt

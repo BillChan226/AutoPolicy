@@ -14,8 +14,8 @@ from policy_extractor_async import PolicyExtractionAgent, MCPServerStdio
 
 # Define demo examples
 DEMO_EXAMPLES = [
-    ["https://redditinc.com/policies/reddit-rules", "Reddit", "html", "1-5", "Focus on rules that target users and customers", True, True],
-    ["/scratch/czr/GuardBench/ShieldAgent/policy_docs/eu_ai_act_art_5.txt", "EU AI ACT", "txt", "1-5", "", True, True],
+    ["https://redditinc.com/policies/reddit-rules", "Reddit", "html", "1-5", "Focus on rules that target users and customers", False, True],
+    ["/scratch/czr/GuardBench/ShieldAgent/policy_docs/eu_ai_act_art_5.txt", "EU AI ACT", "txt", "1-5", "", False, True],
     ["/scratch/czr/GuardBench/ShieldAgent/policy_docs/eu_ai_act_art5.pdf", "EU AI ACT", "pdf", "2-8", "", False, True]
 ]
 

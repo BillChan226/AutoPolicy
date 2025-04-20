@@ -9,3 +9,4 @@ __pycache__/*
 *.py
 .gradio/*
 .temp_uploads/*
+utility/__pycache__/*
