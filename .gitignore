@@ -8,4 +8,5 @@ __pycache__/*
 *.pyz
 *.py
 .gradio/*
+temp_uploads/*
 utility/__pycache__/*
