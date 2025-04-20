@@ -2,18 +2,16 @@
 
 ## Automatic Policy Extraction Pipeline
 
-> An agentic approach for automatically extracting structured policies and rules from various document types using a search tree approach.
 
-This tool extracts policies and rules from **PDF**, **HTML**, and **TXT** documents and produce structured risk categories governed by corresponding rule definitions.
+Based on MCP, this agent extracts policies and rules from **PDF**, **HTML**, and **TXT** documents and produce structured risk categories governed by corresponding rule definitions.
 
 > `deep policy exploration` feature: Designed for automatically exploring comprehensive policies among lengthy PDF documents or distributed HTML websites via a priority-based search algorithm that explores document subsections in-depth.
 
 ## ✨ Features
 
 - 📚 Supports multiple document types (PDF, HTML, TXT)
-- 🔍 Deep exploration of document sections and links
-- 🌲 Uses a search tree approach to systematically explore documents
-- ⚙️ Prioritizes sections based on likelihood of containing policies
+- 🔍 Deep exploration of document sections and links via tree-search
+- ⚙️ Prioritizes sections based on likelihood of containing target policies
 - 🔄 Parallel processing support for faster extraction
 - 📊 Comprehensive output including document trees and visualizations
 - 🏷️ Automatic rules extraction and risk categorization
