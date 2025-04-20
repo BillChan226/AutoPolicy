@@ -182,7 +182,7 @@ python policy_extractor_async.py \
 2. **Content Extraction**: Text is extracted from the document
 3. **Section Analysis**: The system analyzes sections for policy content
 4. **Policy Extraction**: Policies are identified and extracted
-5. **Deep Exploration**: If enabled, the system explores linked sections
+5. **Deep Exploration**: If enabled, the system explores other related links or subsections
 6. **Rules Extraction**: Concrete rules are extracted from policies
 7. **Risk Categorization**: Rules are categorized by risk type
 8. **Output Generation**: Results are saved to JSON files
