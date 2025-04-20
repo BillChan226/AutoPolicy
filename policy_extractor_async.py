@@ -1060,7 +1060,6 @@ async def main():
     # Initialize PolicyExtractionAgent with output directory
     env_vars = os.environ.copy()
 
-    # ➊ Open and close the MCP server in the SAME coroutine
     async with MCPServerStdio(
         name="Policy Extraction Server",
         params={
@@ -1071,7 +1070,6 @@ async def main():
         cache_tools_list=True,
     ) as mcp_server:
 
-        # ➋ Pass the ready‑to‑use server into your agent
         policy_agent = PolicyExtractionAgent(
             mcp_server=mcp_server,            
             output_dir=args.output_dir,
