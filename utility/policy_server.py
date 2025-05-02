@@ -42,8 +42,151 @@ policy_extraction_mcp = FastMCP("Policy Extraction Server")
 document_sections_queue = queue.Queue()
 visited_sections = set()  # To track which sections have already been visited
 
+# @policy_extraction_mcp.tool()
+# def extract_text_from_pdf(pdf_path: str, output_dir: str = None, page_range: str = "-1", include_links: bool = True, toc: bool = False) -> Dict[str, Any]:
+#     """
+#     Extract text content and links from a PDF file with optional page range and save to a file.
+    
+#     Args:
+#         pdf_path: Path to the PDF file
+#         output_dir: Directory to save the extracted text file
+#         page_range: Page number to extract (e.g. "1-10, 5-20"). Use -1 for all pages,
+#         include_links: Whether to include link information in the output
+#         toc: Whether to include an overview of each page (i.e., table of contents) or the entire document in the output
+#     Returns:
+#         Dict: Information about the extraction including the file path where text was saved
+#     """
+#     try:
+#         # Create a descriptive filename based on the PDF and page range
+#         pdf_name = Path(pdf_path).stem
+#         if page_range == "-1":
+#             page_desc = "all_pages"
+#         elif isinstance(page_range, int):
+#             page_desc = f"page_{page_range}"
+#         else:
+#             page_desc = f"pages_{page_range}"
+        
+#         # Create output directory if it doesn't exist
+#         if not output_dir:
+#             output_dir = Path(pdf_path).parent
+#         os.makedirs(output_dir, exist_ok=True)
+        
+#         # Create output file path
+#         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+#         output_file = os.path.join(output_dir, f"{pdf_name}_{page_desc}_{timestamp}.txt")
+        
+#         doc = fitz.open(pdf_path)
+#         full_text = ""
+        
+#         # Determine which pages to process
+#         if page_range == -1:
+#             # Process all pages
+#             pages_to_process = range(len(doc))
+#         elif isinstance(page_range, int):
+#             # Process a single page (convert to 0-based index)
+#             default_range = 5
+#             if page_range < 1 or page_range > len(doc):
+#                 return {"error": f"Invalid page number {page_range}. The document has {len(doc)} pages."}
+#             pages_to_process = range(page_range - 1, page_range + default_range)
+#         elif isinstance(page_range, str) and "-" in page_range:
+#             # Process a range of pages
+#             try:
+#                 start, end = map(int, page_range.split("-"))
+#                 if start < 1 or end > len(doc) or start > end:
+#                     # return {"error": f"Invalid page range {page_range}. The document has {len(doc)} pages."}
+#                     end = len(doc)
+#                     logger.warning(f"Invalid page range {page_range}. The document has {len(doc)} pages. Adjusting end to {end}.")
+#                 pages_to_process = range(start - 1, end)  # Convert to 0-based index
+#             except ValueError:
+#                 return {"error": f"Invalid page range format '{page_range}'. Use format like '5-10'."}
+#         else:
+#             return {"error": f"Invalid page_range parameter. Use -1 for all pages, a single number, or a range like '5-10'."}
+        
+#         # Get TOC items for contextual information
+#         toc = doc.get_toc()
+#         toc_by_page = {}
+        
+#         for item in toc:
+#             level, title, page_num = item
+#             if page_num not in toc_by_page:
+#                 toc_by_page[page_num] = []
+#             toc_by_page[page_num].append({"level": level, "title": title})
+        
+#         all_links = []
+#         # Process each page
+#         for page_idx in pages_to_process:
+#             page = doc[page_idx]
+#             page_num = page_idx + 1  # 1-based page number for output
+            
+#             # Add page header with TOC information if available
+#             if page_num in toc_by_page:
+#                 headings = toc_by_page[page_num]
+#                 full_text += f"\n--- Page {page_num} Headings ---\n"
+#                 for heading in headings:
+#                     full_text += f"{'  ' * (heading['level']-1)}• {heading['title']}\n"
+            
+#             # Extract text from the page
+#             page_text = page.get_text()
+#             full_text += f"\n--- Page {page_num} Content ---\n{page_text}\n"
+            
+#             # Extract links from the page and include them with this page
+#             if include_links:
+#                 links = page.get_links()
+#                 if links:
+#                     full_text += f"\n--- Page {page_num} Links ---\n"
+#                     for i, link in enumerate(links):
+#                         if 'uri' in link:
+#                             full_text += f"Link {i+1}: Web link: {link['uri']}\n"
+#                             all_links.append({
+#                                 'url': link['uri'],
+#                                 'text': f"Link {i+1}: Web link: {link['uri']}"
+#                             })
+#                         elif 'page' in link:
+#                             target_page = link['page'] + 1  # Convert 0-based to 1-based
+#                             full_text += f"Link {i+1}: Internal link to page {target_page}\n"
+#                             all_links.append({
+#                                 'url': f"page_{target_page}",
+#                                 'text': f"Link {i+1}: Internal link to page {target_page}"
+#                             })
+        
+#         # Write the extracted text to the output file
+#         with open(output_file, 'w', encoding='utf-8') as f:
+#             f.write(full_text)
+            
+#         logger.info(f"Saved extracted PDF text to {output_file}")
+        
+#         preview_count = 1000
+#         # Get a preview of the content (first 200 chars)
+#         preview = full_text[:preview_count] + "..." if len(full_text) > preview_count else full_text
+        
+#         # Return structured data with file path directly accessible
+#         result = {
+#             "success": True,
+#             "file_path": output_file,
+#             "source": pdf_path,
+#             "pages": page_desc,
+#             "total_pages_processed": len(list(pages_to_process)),
+#             "preview": preview,
+#             "message": f"""PDF TEXT EXTRACTION COMPLETE:
+# - Source: {pdf_path}
+# - Pages: {page_desc}
+# - Total pages processed: {len(list(pages_to_process))}
+# - Full page content saved to: {output_file}
+# - Page content preview: {preview}
+
+# If needed, USE THIS FILE PATH to extract policies: {output_file}"""
+#         }
+        
+#         return result
+    
+#     except Exception as e:
+#         error_msg = f"Error extracting text from PDF: {str(e)}"
+#         logger.error(error_msg)
+#         return {"success": False, "error": error_msg}
+    
+
 @policy_extraction_mcp.tool()
-def extract_text_from_pdf(pdf_path: str, output_dir: str = None, page_range: str = "-1", include_links: bool = True) -> Dict[str, Any]:
+def extract_text_from_pdf(pdf_path: str, output_dir: str = None, page_range: str = "-1", include_links: bool = True, toc: bool = False) -> Dict[str, Any]:
     """
     Extract text content and links from a PDF file with optional page range and save to a file.
     
@@ -52,7 +195,7 @@ def extract_text_from_pdf(pdf_path: str, output_dir: str = None, page_range: str
         output_dir: Directory to save the extracted text file
         page_range: Page number to extract (e.g. "1-10, 5-20"). Use -1 for all pages,
         include_links: Whether to include link information in the output
-        
+        toc: Whether to include an overview of each page (i.e., table of contents) or the entire document in the output
     Returns:
         Dict: Information about the extraction including the file path where text was saved
     """
@@ -93,7 +236,9 @@ def extract_text_from_pdf(pdf_path: str, output_dir: str = None, page_range: str
             try:
                 start, end = map(int, page_range.split("-"))
                 if start < 1 or end > len(doc) or start > end:
-                    return {"error": f"Invalid page range {page_range}. The document has {len(doc)} pages."}
+                    # return {"error": f"Invalid page range {page_range}. The document has {len(doc)} pages."}
+                    end = len(doc)
+                    logger.warning(f"Invalid page range {page_range}. The document has {len(doc)} pages. Adjusting end to {end}.")
                 pages_to_process = range(start - 1, end)  # Convert to 0-based index
             except ValueError:
                 return {"error": f"Invalid page range format '{page_range}'. Use format like '5-10'."}
@@ -101,16 +246,17 @@ def extract_text_from_pdf(pdf_path: str, output_dir: str = None, page_range: str
             return {"error": f"Invalid page_range parameter. Use -1 for all pages, a single number, or a range like '5-10'."}
         
         # Get TOC items for contextual information
-        toc = doc.get_toc()
+        toc_items = doc.get_toc()
         toc_by_page = {}
         
-        for item in toc:
+        for item in toc_items:
             level, title, page_num = item
             if page_num not in toc_by_page:
                 toc_by_page[page_num] = []
             toc_by_page[page_num].append({"level": level, "title": title})
         
         all_links = []
+        
         # Process each page
         for page_idx in pages_to_process:
             page = doc[page_idx]
@@ -123,9 +269,54 @@ def extract_text_from_pdf(pdf_path: str, output_dir: str = None, page_range: str
                 for heading in headings:
                     full_text += f"{'  ' * (heading['level']-1)}• {heading['title']}\n"
             
-            # Extract text from the page
-            page_text = page.get_text()
-            full_text += f"\n--- Page {page_num} Content ---\n{page_text}\n"
+            # Check if we're doing TOC-only mode (page summary with headers)
+            if toc:
+                # For TOC mode, only include page headers and top-level headings
+                full_text += f"\n=== PAGE {page_num} SUMMARY ===\n"
+                
+                # Extract text from the page
+                page_text = page.get_text()
+                
+                # Try to identify headers (# and ##) in the text
+                lines = page_text.split("\n")
+                headers = []
+                
+                for line in lines:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    
+                    # Look for potential headings based on formatting
+                    # For h1/h2 level headers: ALL CAPS, Title Case, or numerical prefixes like "1.2"
+                    if (len(line) < 100 and line.upper() == line and len(line) > 3) or \
+                       (len(line) < 80 and line[0].isupper() and ":" in line) or \
+                       (re.match(r"^\d+(\.\d+)*\s+[A-Z]", line) and len(line) < 80):
+                        # Could be a header - add as a level 1 or 2 heading
+                        if len(line) < 50 or line.upper() == line:  # Shorter or ALL CAPS = level 1
+                            headers.append(f"# {line}")
+                        else:
+                            headers.append(f"## {line}")
+                
+                # Add the headers to the text
+                if headers:
+                    full_text += "\n".join(headers) + "\n"
+                    full_text += f"Page content:\n{page_text}\n"
+                else:
+                    full_text += "(No clear headers found on this page)\n"
+                
+                # If there are TOC entries for this page, add them as well
+                if page_num in toc_by_page:
+                    headings = toc_by_page[page_num]
+                    if headings and not headers:  # Only add if we didn't find headers in the text
+                        full_text += "\nFrom TOC:\n"
+                        for heading in headings:
+                            level_marker = "#" * min(heading['level'], 2)  # Limit to ## level
+                            full_text += f"{level_marker} {heading['title']}\n"
+                
+            else:
+                # Regular mode - extract full text
+                page_text = page.get_text()
+                full_text += f"\n--- Page {page_num} Content ---\n{page_text}\n"
             
             # Extract links from the page and include them with this page
             if include_links:
@@ -151,7 +342,7 @@ def extract_text_from_pdf(pdf_path: str, output_dir: str = None, page_range: str
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write(full_text)
             
-        logger.info(f"Saved extracted PDF text to {output_file}")
+        logger.info(f"Saved extracted PDF text to {output_file} (TOC mode: {toc})")
         
         preview_count = 1000
         # Get a preview of the content (first 200 chars)
@@ -165,10 +356,12 @@ def extract_text_from_pdf(pdf_path: str, output_dir: str = None, page_range: str
             "pages": page_desc,
             "total_pages_processed": len(list(pages_to_process)),
             "preview": preview,
+            "toc_mode": toc,
             "message": f"""PDF TEXT EXTRACTION COMPLETE:
 - Source: {pdf_path}
 - Pages: {page_desc}
 - Total pages processed: {len(list(pages_to_process))}
+- Mode: {'Page summaries (TOC mode)' if toc else 'Full text'}
 - Full page content saved to: {output_file}
 - Page content preview: {preview}
 
@@ -181,7 +374,8 @@ If needed, USE THIS FILE PATH to extract policies: {output_file}"""
         error_msg = f"Error extracting text from PDF: {str(e)}"
         logger.error(error_msg)
         return {"success": False, "error": error_msg}
-    
+
+
 
 @policy_extraction_mcp.tool()
 def extract_text_from_html(url: str, output_dir: str = None, include_links: bool = True, allow_redirects: bool = True) -> Dict[str, Any]:
@@ -361,7 +555,7 @@ If needed, USE THIS FILE PATH to extract policies: {output_file}"""
         return {"success": False, "error": error_msg}
 
 @policy_extraction_mcp.tool()
-def extract_policies_from_file(file_path: str, organization: str, organization_description: str, target_subject: str, policy_db_path: str) -> Dict[str, Any]:
+def extract_policies_from_file(file_path: str, organization: str, organization_description: str, target_subject: str, policy_db_path: str, user_request: str = "") -> Dict[str, Any]:
     """
     Extract structured policies from a text file and save them to a central JSON file.
     
@@ -391,7 +585,7 @@ def extract_policies_from_file(file_path: str, organization: str, organization_d
     # Get file info for reference
     file_info = os.path.basename(file_path)
         
-    system_prompt = """You are a helpful policy extraction model to identify actionable policies from organizational safety guidelines. Your task is to extract all the meaningful policies from the provided organization handbook which sets restrictions or guidelines for user or entity behaviors in this organization. You will extract specific elements from the given policies and guidelines to produce structured and actionable outputs."""
+    system_prompt = """You are a helpful policy extraction model to identify actionable policies from organizational safety guidelines. Your task is to extract all the meaningful policies from the provided organization handbook which sets restrictions or guidelines for user or entity behaviors in this organization. You will extract specific elements from the given policies and guidelines to produce structured and actionable outputs. Meanwhile, you should follow the user's request and extract policies accordingly."""
     
     user_prompt = f"""As a policy extraction model to extract and clean up useful policies from {organization} ({organization_description}), your tasks are:
 1. Read and analyze the provided safety policy document (e.g. likely a PDF handbook or HTML website). Specifically, this document may contain irrelevant information such as structure text, headers, footers, etc. However, you should focus on meaningful policies that constrain the behaviors of the target subject {target_subject}.
@@ -402,11 +596,14 @@ def extract_policies_from_file(file_path: str, organization: str, organization_d
    2) Scope: Conditions under which this policy is enforceable (e.g. time period, user group).
    3) Policy Description: The exact description of the policy detailing the restriction or guideline targeting {target_subject}.
    4) Reference: All the referenced sources in the original policy article from which the policy elements were extracted. These sources should be organized piece by piece in a list.
+4. If the user has provided an additional request, you should follow the user's request and extract policies accordingly. If not, you should extract all the meaningful policies from the document.
+
+USER REQUEST: {user_request}
 
 Here is the document to extract policies from:
 
 ---Start of Document---
-{text[:120000]}
+{text[:150000]}
 ---End of Document---
 
 **Output format**:
@@ -430,6 +627,7 @@ Provide the output in the following JSON format:
     # Try up to 3 times to get a valid JSON response
     for _ in range(5):
         try:
+            # logger.info(f"user_prompt: {user_prompt}")
             response = chat_text(
                 prompt=user_prompt, 
                 system=system_prompt, 
@@ -439,7 +637,13 @@ Provide the output in the following JSON format:
                 temperature=0.2,
                 )
 
-    
+            # with open(f"response_{file_info}.txt", "w", encoding="utf-8") as f:
+            #     f.write(response)
+
+            # logger.info(f"user_prompt: {user_prompt}")
+
+            # logger.info(f"Internal response: {response}")
+            # input("Press Enter to continue...")
             # Extract the JSON part from the response
             json_start = response.find("[")
             json_end = response.rfind("]") + 1
@@ -941,11 +1145,12 @@ def analyze_document_section(content: str, section_info: Dict[str, Any], user_re
     """
     try:
         # Truncate content if too long
-        max_content_length = 120000
+        max_content_length = 160000
         if len(content) > max_content_length:
             truncated_content = content[:max_content_length] + "...[TRUNCATED]"
         else:
             truncated_content = content
+        # truncated_content = content
         
         # Format information about already found sections
         sections_found_text = ""
@@ -1045,6 +1250,9 @@ Be objective and thorough in your analysis. Focus on identifying actual policy c
             temperature=0.2,
         )
         
+        # with open(f"response.txt", "w", encoding="utf-8") as f:
+        #     f.write(response_text)
+
         # Extract JSON from the response text
         json_start = response_text.find("{")
         json_end = response_text.rfind("}") + 1
@@ -1148,12 +1356,17 @@ Some rules may be overly broad, contain multiple sub-parts, or overlap with othe
 - Organize the refined rules into meaningful safety categories (e.g., Harassment, Hate Speech, Privacy Violations).
 - Each category should capture a distinct type of safety concern relevant to {organization} governed by a distinct set of rules.
 - Each risk category should be unique and try to overlap with the other categories as little as possible.
+- You should not merge two clusters as one risk category if they are different types of safety concerns. You can keep as many risk categories as you want as long as they are distinct and representative of different types of safety concerns.
 
 4. Refine and Standardize Wording
 - Use clear, professional language for all rules.
 - Ensure each rule is concise, precise, and consistently formatted.
 - Avoid vague, overly broad, or compound statements.
 - Format rules from the perspective of "{target_subject} must/must not..." where appropriate.
+
+5. Assign Risk Level to Each Risk Category
+- Assign a risk level to each risk category based on the severity of the risks it covers. You should consider both the severity of the risks and the potential impact of the risks on {organization} and {target_subject}.
+- Use the following scale: [low, medium, high]
 
 🧾 **Input**
 A raw, numbered list of safety rules (may include overlapping, vague, or compound rules):
@@ -1168,6 +1381,7 @@ Your response must be VALID JSON with the following structure:
   {{
     "category_name": "Descriptive Name of the Risk Category",
     "category_rationale": "Brief explanation of which risks this category covers for {organization} and {target_subject}",
+    "risk_level": "low, medium, high",
     "rules": [
       {{
         "rule_description": "Refined rule text",

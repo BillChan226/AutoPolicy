@@ -14,9 +14,9 @@ from policy_extractor_async import PolicyExtractionAgent, MCPServerStdio
 
 # Define demo examples
 DEMO_EXAMPLES = [
-    ["https://redditinc.com/policies/reddit-rules", "Reddit", "html", "1-5", "Focus on rules that target users and customers", False, True],
-    ["/scratch/czr/GuardBench/ShieldAgent/policy_docs/eu_ai_act_art_5.txt", "EU AI ACT", "txt", "1-5", "", False, True],
-    ["/scratch/czr/GuardBench/ShieldAgent/policy_docs/eu_ai_act_art5.pdf", "EU AI ACT", "pdf", "2-8", "", False, True]
+    ["https://redditinc.com/policies/reddit-rules", "Reddit", "html", "1-1000", "Focus on rules that target users and customers", False, True],
+    ["/scratch/czr/GuardBench/ShieldAgent/policy_docs/eu_ai_act_art_5.txt", "EU AI ACT", "txt", "1-1000", "", False, True],
+    ["/scratch/czr/GuardBench/ShieldAgent/policy_docs/eu_ai_act_art5.pdf", "EU AI ACT", "pdf", "1-1000", "", False, True]
 ]
 
 # Temporary directory for uploaded files
@@ -31,7 +31,7 @@ extraction_active = threading.Event()
 
 def run_extraction(openai_api_key, anthropic_api_key, file_upload, url_input, policy_text, organization, input_type, page_range, 
                   organization_description, target_subject, deep_policy, 
-                  extract_rules, model, user_request, async_num, debug,
+                  extract_rules, model, user_request, async_num, debug, exploration_budget,
                   progress=gr.Progress()):
     """Run the policy extraction process"""
     # Reset active state
@@ -117,7 +117,8 @@ def run_extraction(openai_api_key, anthropic_api_key, file_upload, url_input, po
         "--output-dir", output_dir,
         "--model", model,
         "--async-num", str(async_num),
-        "--user-request", user_request
+        "--user-request", user_request,
+        "--exploration-budget", str(exploration_budget)
     ]
     
     if organization_description:
@@ -169,6 +170,7 @@ def run_extraction(openai_api_key, anthropic_api_key, file_upload, url_input, po
                 debug=debug,
                 model=model,
                 async_sections=async_num,
+                exploration_budget=exploration_budget
             )
             
             # Add a custom log handler to capture logs
@@ -183,7 +185,7 @@ def run_extraction(openai_api_key, anthropic_api_key, file_upload, url_input, po
             # Extract policies
             try:
                 policies = await policy_agent.extract_policies(
-                    document_path, input_type, page_range, deep_policy
+                    document_path, input_type, page_range, deep_policy, exploration_budget
                 )
                 result["policies"] = policies
                 
@@ -249,8 +251,12 @@ def run_extraction(openai_api_key, anthropic_api_key, file_upload, url_input, po
             if os.path.exists(policies_path):
                 with open(policies_path, 'r') as f:
                     policies_json = json.dumps(json.load(f), indent=2)
+                if not policies_json:
+                    policies_json = "No policies were extracted"
+            else:
+                policies_json = "No policies were extracted"
         except:
-            policies_json = "No policies found"
+            policies_json = "No policies were extracted"
     
     # Format rules
     if result["rules"]:
@@ -316,7 +322,7 @@ def format_risk_categories_html(categories_data):
     
     for i, category in enumerate(categories):
         # Determine severity and appropriate color
-        severity = category.get('severity', 'medium').lower()
+        severity = category.get('risk_level', 'medium').lower()
         if not severity:
             severity = "medium"  # Default if missing
             
@@ -696,11 +702,11 @@ def create_ui():
     }
     """
     
-    with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue"), css=custom_css, title="Automatic Policy Extraction Tool") as app:
+    with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue"), css=custom_css, title="Automatic Policy Risk Category Extraction") as app:
         gr.Markdown("""
-        # 📄 Automatic Policy Extraction Tool
+        # 📄 Automatic Policy Risk Category Extraction
         
-        > Extract structured policies, rules, and risk categories from documents (PDF, HTML, TXT) using a systematic search tree approach.
+        > An agentic approach to extract structured policies, rules, and risk categories from documents (PDF, HTML, TXT).
         """, elem_classes="header")
         
         with gr.Row():
@@ -780,7 +786,7 @@ def create_ui():
                             organization = gr.Textbox(label="🏢 Organization Name", value="Organization")
                             org_description = gr.Textbox(label="📝 Organization Description (optional)")
                             target_subject = gr.Textbox(label="👤 Target Subject", value="User")
-                            page_range = gr.Textbox(label="📑 Page Range (PDF only)", value="1-5")
+                            page_range = gr.Textbox(label="📑 Page Range (PDF only)", value="1-1000")
                             user_request = gr.Textbox(
                                 label="❓ User Request (optional)", 
                                 placeholder="Focus on specific aspects...",
@@ -797,6 +803,16 @@ def create_ui():
                                 deep_policy = gr.Checkbox(label="🔍 Deep Policy Exploration", value=False)
                                 extract_rules = gr.Checkbox(label="📋 Extract Rules", value=True)
                                 debug = gr.Checkbox(label="🐛 Debug Mode", value=False)
+                                
+                            with gr.Row():
+                                exploration_budget = gr.Slider(
+                                    minimum=1, 
+                                    maximum=100, 
+                                    step=1, 
+                                    value=20, 
+                                    label="📊 Exploration Budget", 
+                                    info="Maximum number of sections to process in deep policy mode"
+                                )
                             
                             # Warning box for deep policy
                             with gr.Group(visible=False, elem_classes="warning-box") as deep_policy_warning:
@@ -804,6 +820,8 @@ def create_ui():
                                 ⚠️ **WARNING**: Deep Policy Exploration is an experimental feature and still under testing.
                                 
                                 This feature may consume significantly more tokens and processing time as it explores linked documents and nested policy pages. Use with caution.
+                                
+                                Set the Exploration Budget to limit the maximum number of sections processed.
                                 """)
                 
                 # Control buttons (same as before)
@@ -814,10 +832,8 @@ def create_ui():
                 # Stop message display
                 stop_message = gr.Textbox(label="Status", visible=False)
             
-            # Results area - Modified to display sections vertically without tabs
+            # Results area - Modified to display sections vertically without header/bar
             with gr.Column(scale=2):
-                gr.Markdown("### 📊 Results", elem_classes="section-header")
-                
                 with gr.Column(elem_classes="results-container"):
                     # Risk Categories Section
                     with gr.Group(elem_classes="result-section"):
@@ -893,7 +909,8 @@ def create_ui():
                 model,
                 user_request,
                 async_num,
-                debug
+                debug,
+                exploration_budget
             ],
             outputs=[policies_output, rules_output, categories_output, logs_output]
         )

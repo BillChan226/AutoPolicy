@@ -70,7 +70,8 @@ class PolicyExtractionAgent:
         user_request: str = "",
         debug: bool = False,
         model: str = "claude-3-7-sonnet-20250219",
-        async_sections: int = 1  # Default to 1 section at a time (no parallelism)
+        async_sections: int = 1,  # Default to 1 section at a time (no parallelism)
+        exploration_budget: int = None  # Add exploration budget parameter
     ):
         """
         Initialize the PolicyExtractionAgent.
@@ -82,6 +83,7 @@ class PolicyExtractionAgent:
             debug: Whether to print debug information
             model: The LLM model to use for analysis
             async_sections: Number of sections to process in parallel (1-3)
+            exploration_budget: Maximum number of sections to process (None for unlimited)
         """
         self.debug = debug
         self.debug_log = []
@@ -93,6 +95,9 @@ class PolicyExtractionAgent:
         
         # Limit async_sections to a reasonable range (1-3)
         self.async_sections = min(max(1, async_sections), 3)
+        
+        # Initialize exploration budget for deep policy mode
+        self.exploration_budget = exploration_budget
         
         # Set up output directory
         if output_dir:
@@ -360,7 +365,8 @@ class PolicyExtractionAgent:
                     "extract_text_from_pdf", 
                     pdf_path=section['path'],
                     output_dir=extraction_dir,
-                    page_range=section.get('range', '-1')
+                    page_range=section.get('range', '-1'),
+                    toc=section.get('toc', False)
                 )
             elif section['type'] == 'txt':
                 # For txt files, just read the content directly
@@ -421,9 +427,12 @@ class PolicyExtractionAgent:
                 user_request=self.user_request,
                 sections_found=self.sections_found
             )
-            
-            self.log(f"Section {section['section_name']} includes policies for extraction and {len(analysis.get('subsections', []))} subsections", "INFO")
-            self.log(f"Subsections: {analysis.get('subsections', [])}", "RESULT")
+
+            if not analysis.get("has_policies", False):
+                self.log(f"Section {section['section_name']} does not include policies for extraction", "INFO")
+            else:
+                self.log(f"Section {section['section_name']} includes policies for extraction", "INFO")
+                self.log(f"Subsections: {analysis.get('subsections', [])}", "RESULT")
             
             # Extract policies if the section contains them
             if analysis.get("has_policies", False):
@@ -436,7 +445,8 @@ class PolicyExtractionAgent:
                     organization=self.organization,
                     organization_description=self.organization_description,
                     target_subject=self.target_subject,
-                    policy_db_path=self.policies_path
+                    policy_db_path=self.policies_path,
+                    user_request=self.user_request
                 )
                 
                 # Process the structured dictionary response
@@ -500,7 +510,8 @@ class PolicyExtractionAgent:
         document_path: str, 
         input_type: str = "pdf",
         initial_page_range: str = "1-3",
-        deep_policy: bool = False
+        deep_policy: bool = False,
+        exploration_budget: int = None  # Add exploration budget parameter
     ) -> List[Dict[str, Any]]:
         """
         Extract policies from a document using the search tree approach.
@@ -509,12 +520,17 @@ class PolicyExtractionAgent:
             document_path: Path to PDF file or URL for HTML
             input_type: "pdf" or "html"
             deep_policy: Whether to explore linked pages/sections
+            exploration_budget: Maximum number of sections to process (None for unlimited)
             
         Returns:
             List of extracted policies
         """
         # Start timing the overall extraction process
         overall_start_time = time.time()
+
+        # Override instance budget if one is provided directly to the method
+        if exploration_budget is not None:
+            self.exploration_budget = exploration_budget
 
         self.log(f"Created extraction directory: {self.extraction_dir}")
         
@@ -536,7 +552,8 @@ class PolicyExtractionAgent:
             "range": initial_page_range if input_type == "pdf" else "",
             "type": input_type,
             "priority": 10,  # Highest priority
-            "source": "User Input"
+            "source": "User Input",
+            "toc": deep_policy
         }
         self.sections_found.append(initial_section)
         self.add_sections_to_queue([initial_section])
@@ -567,6 +584,18 @@ class PolicyExtractionAgent:
         policies_extracted = 0
         
         while self.exploration_queue or self.processing_sections:
+            # Check if we've reached the exploration budget
+            if self.exploration_budget is not None and sections_processed >= self.exploration_budget:
+                self.log(f"Reached exploration budget of {self.exploration_budget} sections. Terminating exploration.", "INFO")
+                # Clear the queue to stop future processing
+                self.exploration_queue = []
+                # Wait for any in-progress sections to complete
+                if self.processing_sections:
+                    await asyncio.sleep(0.1)
+                    continue
+                else:
+                    break
+                
             # Skip getting new sections if we're already processing the maximum number
             if len(self.processing_sections) >= self.async_sections:
                 # Wait a bit for an ongoing task to complete
@@ -1025,12 +1054,12 @@ async def main():
     
     parser = argparse.ArgumentParser(description="Extract policies from policy documents")
     parser.add_argument("--document-path", "-d", required=True, help="Path to PDF file or URL for HTML")
-    parser.add_argument("--organization", "-org", required=True, help="Name of the organization")
+    parser.add_argument("--organization", "-org", required=False, help="Name of the organization")
     parser.add_argument("--organization-description", "-org-desc", required=False, default="", help="Description of the organization")
     parser.add_argument("--target-subject", "-ts", required=False, default="User", help="Target subject of the organization")
     parser.add_argument("--input-type", "-t", choices=["pdf", "html", "txt"], default="pdf", 
                         help="Type of input document (pdf, html, or txt)")
-    parser.add_argument("--initial-page-range", "-ipr", default="1-5",
+    parser.add_argument("--initial-page-range", "-ipr", default="1-10000",
                         help="Initial page range to extract from PDF")
     parser.add_argument("--deep-policy", "-dp", action="store_true", 
                         help="Whether to explore linked pages/sections")
@@ -1038,14 +1067,16 @@ async def main():
                         help="Directory to save output files")
     parser.add_argument("--model", "-m", default="claude-3-7-sonnet-20250219", 
                         help="Model to use (claude-3-7-sonnet-20250219 or gpt-4o)")
-    parser.add_argument("--debug", action="store_true", 
+    parser.add_argument("--debug", action="store_true", default=True,
                         help="Enable debug mode")
     parser.add_argument("--user-request", "-u", default="", 
                         help="User request for the policy extraction")
     parser.add_argument("--async-num", "-a", type=int, default=1,
                         help="Number of policy extraction tasks to run in parallel (1-3)")
-    parser.add_argument("--extract-rules", "-er", action="store_true",
+    parser.add_argument("--extract-rules", "-er", action="store_true", default=True,
                         help="Extract concrete rules from policies after extraction")
+    parser.add_argument("--exploration-budget", "-eb", type=int, default=20,
+                        help="Maximum number of sections to process (None for unlimited)")
     
     args = parser.parse_args()
 
@@ -1078,12 +1109,16 @@ async def main():
             debug=args.debug,
             model=args.model,
             async_sections=args.async_num,
+            exploration_budget=args.exploration_budget
         )
 
         policies = await policy_agent.extract_policies(
-            args.document_path, args.input_type, args.initial_page_range, args.deep_policy
+            args.document_path, args.input_type, args.initial_page_range, args.deep_policy, args.exploration_budget
         )
 
+        if len(policies) == 0:
+            print(f"No policies found for the provided document: {args.document_path}")
+            return
 
         if args.extract_rules:
             rules = await policy_agent.extract_rules(
