@@ -1,12 +1,6 @@
 results/*
 output/*
 __pycache__/*
-*.pyc
-*.pyo
-*.pyd
-*.pyw
-*.pyz
-*.py
 .gradio/*
 temp_uploads/*
 utility/__pycache__/*
