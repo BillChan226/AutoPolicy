@@ -1,0 +1,47 @@
+============================== prooftrans ============================
+Prover9 (32) version 2008-05B, May 2008.
+Process 27404 was started by mccune on cleo,
+Wed Jun 11 09:40:57 2008
+The command was "./prover9 -f b1.in".
+============================== end of head ===========================
+
+============================== end of input ==========================
+
+============================== PROOF =================================
+
+% -------- Comments from original proof --------
+% Proof 1 at 0.04 (+ 0.00) seconds: [minusinfinity,b(a(minusinfinity)),a(minusinfinity),infinity].
+% Length of proof is 22.
+% Level of proof is 7.
+% Maximum clause weight is 10.
+% Given clauses 71.
+
+1 -between(x,y,z) | before(x,y).  [assumption].
+2 x = minusinfinity | between(minusinfinity,b(x),x).  [assumption].
+3 x = infinity | between(x,a(x),infinity).  [assumption].
+4 -between(x,y,z) | before(y,z).  [assumption].
+6 -before(x,y) | -before(y,z) | -before(z,u) # answer([x,y,z,u]).  [assumption].
+14 minusinfinity != infinity.  [assumption].
+15 before(minusinfinity,b(x)) | x = minusinfinity.  [resolve(1,a,2,b)].
+16 before(minusinfinity,b(x)) | minusinfinity = x.  [copy(15),flip(b)].
+17 before(x,a(x)) | x = infinity.  [resolve(1,a,3,b)].
+18 before(x,a(x)) | infinity = x.  [copy(17),flip(b)].
+19 before(b(x),x) | x = minusinfinity.  [resolve(4,a,2,b)].
+20 before(b(x),x) | minusinfinity = x.  [copy(19),flip(b)].
+21 before(a(x),infinity) | x = infinity.  [resolve(4,a,3,b)].
+22 before(a(x),infinity) | infinity = x.  [copy(21),flip(b)].
+48 minusinfinity = x | -before(y,minusinfinity) | -before(b(x),z) # answer([y,minusinfinity,b(x),z]).  [resolve(16,a,6,b)].
+49 minusinfinity = x | -before(b(x),y) | -before(y,z) # answer([minusinfinity,b(x),y,z]).  [resolve(16,a,6,a)].
+218A minusinfinity = x | -before(y,minusinfinity) | minusinfinity = x # answer([y,minusinfinity,b(x),x]).  [resolve(48,c,20,a)].
+218 minusinfinity = x | -before(y,minusinfinity) # answer([y,minusinfinity,b(x),x]).  [copy(218A),merge(c)].
+219 -before(x,minusinfinity) # answer([x,minusinfinity,b(infinity),infinity]).  [resolve(218,a,14,a)].
+221A minusinfinity = x | -before(x,y) | minusinfinity = x # answer([minusinfinity,b(x),x,y]).  [resolve(49,b,20,a)].
+221 minusinfinity = x | -before(x,y) # answer([minusinfinity,b(x),x,y]).  [copy(221A),merge(c)].
+229A minusinfinity = a(x) | infinity = x # answer([minusinfinity,b(a(x)),a(x),infinity]).  [resolve(221,b,22,a)].
+229 a(x) = minusinfinity | infinity = x # answer([minusinfinity,b(a(x)),a(x),infinity]).  [copy(229A),flip(a)].
+246A infinity = x | before(x,minusinfinity) | infinity = x # answer([minusinfinity,b(a(x)),a(x),infinity]).  [para(229(a,1),18(a,2))].
+246B infinity = x | before(x,minusinfinity) # answer([minusinfinity,b(a(x)),a(x),infinity]).  [copy(246A),merge(c)].
+246 infinity = x # answer([x,minusinfinity,b(infinity),infinity]) # answer([minusinfinity,b(a(x)),a(x),infinity]).  [resolve(219,a,246B,b)].
+247 $F # answer([minusinfinity,b(a(minusinfinity)),a(minusinfinity),infinity]) # answer([minusinfinity,minusinfinity,b(infinity),infinity]).  [resolve(246,a,14,a(flip))].
+
+============================== end of proof ==========================

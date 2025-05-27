@@ -1,0 +1,228 @@
+cd ladr         && make lib
+make[1]: Entering directory `/home/mccune/LADR/ladr'
+make libladr.a
+make[2]: Entering directory `/home/mccune/LADR/ladr'
+gcc  -O -Wall   -c -o order.o order.c
+gcc  -O -Wall   -c -o clock.o clock.c
+gcc  -O -Wall   -c -o nonport.o nonport.c
+gcc  -O -Wall   -c -o fatal.o fatal.c
+gcc  -O -Wall   -c -o ibuffer.o ibuffer.c
+gcc  -O -Wall   -c -o memory.o memory.c
+gcc  -O -Wall   -c -o hash.o hash.c
+gcc  -O -Wall   -c -o string.o string.c
+gcc  -O -Wall   -c -o strbuf.o strbuf.c
+gcc  -O -Wall   -c -o glist.o glist.c
+gcc  -O -Wall   -c -o options.o options.c
+gcc  -O -Wall   -c -o symbols.o symbols.c
+gcc  -O -Wall   -c -o avltree.o avltree.c
+gcc  -O -Wall   -c -o term.o term.c
+gcc  -O -Wall   -c -o termflag.o termflag.c
+gcc  -O -Wall   -c -o listterm.o listterm.c
+gcc  -O -Wall   -c -o tlist.o tlist.c
+gcc  -O -Wall   -c -o flatterm.o flatterm.c
+gcc  -O -Wall   -c -o multiset.o multiset.c
+gcc  -O -Wall   -c -o termorder.o termorder.c
+gcc  -O -Wall   -c -o parse.o parse.c
+gcc  -O -Wall   -c -o accanon.o accanon.c
+gcc  -O -Wall   -c -o unify.o unify.c
+gcc  -O -Wall   -c -o fpalist.o fpalist.c
+gcc  -O -Wall   -c -o fpa.o fpa.c
+gcc  -O -Wall   -c -o discrim.o discrim.c
+gcc  -O -Wall   -c -o discrimb.o discrimb.c
+gcc  -O -Wall   -c -o discrimw.o discrimw.c
+gcc  -O -Wall   -c -o dioph.o dioph.c
+gcc  -O -Wall   -c -o btu.o btu.c
+gcc  -O -Wall   -c -o btm.o btm.c
+gcc  -O -Wall   -c -o mindex.o mindex.c
+gcc  -O -Wall   -c -o basic.o basic.c
+gcc  -O -Wall   -c -o attrib.o attrib.c
+gcc  -O -Wall   -c -o formula.o formula.c
+gcc  -O -Wall   -c -o definitions.o definitions.c
+definitions.c: In function ‘is_definition’:
+definitions.c:66: warning: ‘p2’ is used uninitialized in this function
+gcc  -O -Wall   -c -o literals.o literals.c
+gcc  -O -Wall   -c -o topform.o topform.c
+gcc  -O -Wall   -c -o clist.o clist.c
+gcc  -O -Wall   -c -o clauseid.o clauseid.c
+gcc  -O -Wall   -c -o clauses.o clauses.c
+gcc  -O -Wall   -c -o just.o just.c
+gcc  -O -Wall   -c -o cnf.o cnf.c
+gcc  -O -Wall   -c -o clausify.o clausify.c
+gcc  -O -Wall   -c -o parautil.o parautil.c
+gcc  -O -Wall   -c -o pindex.o pindex.c
+gcc  -O -Wall   -c -o compress.o compress.c
+gcc  -O -Wall   -c -o maximal.o maximal.c
+gcc  -O -Wall   -c -o lindex.o lindex.c
+gcc  -O -Wall   -c -o weight.o weight.c
+gcc  -O -Wall   -c -o weight2.o weight2.c
+gcc  -O -Wall   -c -o int_code.o int_code.c
+gcc  -O -Wall   -c -o features.o features.c
+gcc  -O -Wall   -c -o di_tree.o di_tree.c
+gcc  -O -Wall   -c -o fastparse.o fastparse.c
+gcc  -O -Wall   -c -o random.o random.c
+gcc  -O -Wall   -c -o subsume.o subsume.c
+gcc  -O -Wall   -c -o clause_misc.o clause_misc.c
+gcc  -O -Wall   -c -o clause_eval.o clause_eval.c
+gcc  -O -Wall   -c -o flatdemod.o flatdemod.c
+gcc  -O -Wall   -c -o demod.o demod.c
+gcc  -O -Wall   -c -o clash.o clash.c
+gcc  -O -Wall   -c -o resolve.o resolve.c
+gcc  -O -Wall   -c -o paramod.o paramod.c
+gcc  -O -Wall   -c -o backdemod.o backdemod.c
+gcc  -O -Wall   -c -o hints.o hints.c
+gcc  -O -Wall   -c -o ac_redun.o ac_redun.c
+gcc  -O -Wall   -c -o xproofs.o xproofs.c
+gcc  -O -Wall   -c -o ivy.o ivy.c
+gcc  -O -Wall   -c -o interp.o interp.c
+gcc  -O -Wall   -c -o std_options.o std_options.c
+gcc  -O -Wall   -c -o banner.o banner.c
+gcc  -O -Wall   -c -o ioutil.o ioutil.c
+gcc  -O -Wall   -c -o tptp_trans.o tptp_trans.c
+gcc  -O -Wall   -c -o top_input.o top_input.c
+ar rs libladr.a order.o clock.o nonport.o fatal.o ibuffer.o memory.o hash.o string.o strbuf.o glist.o options.o symbols.o avltree.o term.o termflag.o listterm.o tlist.o flatterm.o multiset.o termorder.o parse.o accanon.o unify.o fpalist.o fpa.o discrim.o discrimb.o discrimw.o dioph.o btu.o btm.o mindex.o basic.o attrib.o formula.o definitions.o literals.o topform.o clist.o clauseid.o clauses.o just.o cnf.o clausify.o parautil.o pindex.o compress.o maximal.o lindex.o weight.o weight2.o int_code.o features.o di_tree.o fastparse.o random.o subsume.o clause_misc.o clause_eval.o flatdemod.o demod.o clash.o resolve.o paramod.o backdemod.o hints.o ac_redun.o xproofs.o ivy.o interp.o std_options.o banner.o ioutil.o tptp_trans.o top_input.o
+ar: creating libladr.a
+make[2]: Leaving directory `/home/mccune/LADR/ladr'
+make[1]: Leaving directory `/home/mccune/LADR/ladr'
+cd mace4.src    && make all
+make[1]: Entering directory `/home/mccune/LADR/mace4.src'
+cd ../ladr && make libladr.a
+make[2]: Entering directory `/home/mccune/LADR/ladr'
+make[2]: `libladr.a' is up to date.
+make[2]: Leaving directory `/home/mccune/LADR/ladr'
+make clean
+make[2]: Entering directory `/home/mccune/LADR/mace4.src'
+/bin/rm -f *.o
+make[2]: Leaving directory `/home/mccune/LADR/mace4.src'
+make libmace4.a
+make[2]: Entering directory `/home/mccune/LADR/mace4.src'
+gcc  -O -Wall   -c -o estack.o estack.c
+gcc  -O -Wall   -c -o util.o util.c
+gcc  -O -Wall   -c -o print.o print.c
+gcc  -O -Wall   -c -o syms.o syms.c
+gcc  -O -Wall   -c -o ground.o ground.c
+gcc  -O -Wall   -c -o select.o select.c
+gcc  -O -Wall   -c -o propagate.o propagate.c
+gcc  -O -Wall   -c -o mstate.o mstate.c
+gcc  -O -Wall   -c -o negpropindex.o negpropindex.c
+gcc  -O -Wall   -c -o negprop.o negprop.c
+gcc  -O -Wall   -c -o ordercells.o ordercells.c
+gcc  -O -Wall   -c -o commandline.o commandline.c
+gcc  -O -Wall   -c -o msearch.o msearch.c
+ar rs libmace4.a estack.o util.o print.o syms.o ground.o select.o propagate.o mstate.o negpropindex.o negprop.o ordercells.o commandline.o msearch.o
+ar: creating libmace4.a
+make[2]: Leaving directory `/home/mccune/LADR/mace4.src'
+gcc  -O -Wall   -c -o mace4.o mace4.c
+gcc  -O -Wall -o mace4 mace4.o libmace4.a ../ladr/libladr.a
+/bin/mv mace4 ../bin
+make[1]: Leaving directory `/home/mccune/LADR/mace4.src'
+cd provers.src  && make all
+make[1]: Entering directory `/home/mccune/LADR/provers.src'
+cd ../ladr && make libladr
+make[2]: Entering directory `/home/mccune/LADR/ladr'
+make libladr.a
+make[3]: Entering directory `/home/mccune/LADR/ladr'
+make[3]: `libladr.a' is up to date.
+make[3]: Leaving directory `/home/mccune/LADR/ladr'
+make[2]: Leaving directory `/home/mccune/LADR/ladr'
+make clean
+make[2]: Entering directory `/home/mccune/LADR/provers.src'
+/bin/rm -f *.o
+make[2]: Leaving directory `/home/mccune/LADR/provers.src'
+cd ../mace4.src && make libmace4
+make[2]: Entering directory `/home/mccune/LADR/mace4.src'
+make libmace4.a
+make[3]: Entering directory `/home/mccune/LADR/mace4.src'
+make[3]: `libmace4.a' is up to date.
+make[3]: Leaving directory `/home/mccune/LADR/mace4.src'
+make[2]: Leaving directory `/home/mccune/LADR/mace4.src'
+make clean
+make[2]: Entering directory `/home/mccune/LADR/provers.src'
+/bin/rm -f *.o
+make[2]: Leaving directory `/home/mccune/LADR/provers.src'
+gcc  -O -Wall   -c -o prover9.o prover9.c
+gcc  -O -Wall   -c -o index_lits.o index_lits.c
+gcc  -O -Wall   -c -o forward_subsume.o forward_subsume.c
+gcc  -O -Wall   -c -o demodulate.o demodulate.c
+gcc  -O -Wall   -c -o pred_elim.o pred_elim.c
+gcc  -O -Wall   -c -o unfold.o unfold.c
+gcc  -O -Wall   -c -o semantics.o semantics.c
+gcc  -O -Wall   -c -o giv_select.o giv_select.c
+gcc  -O -Wall   -c -o white_black.o white_black.c
+gcc  -O -Wall   -c -o actions.o actions.c
+gcc  -O -Wall   -c -o search.o search.c
+gcc  -O -Wall   -c -o utilities.o utilities.c
+gcc  -O -Wall   -c -o provers.o provers.c
+gcc  -O -Wall   -c -o foffer.o foffer.c
+gcc  -O -Wall -lm -o prover9 prover9.o index_lits.o forward_subsume.o demodulate.o pred_elim.o unfold.o semantics.o giv_select.o white_black.o actions.o search.o utilities.o provers.o foffer.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o fof-prover9.o fof-prover9.c
+gcc  -O -Wall -lm -o fof-prover9 fof-prover9.o index_lits.o forward_subsume.o demodulate.o pred_elim.o unfold.o semantics.o giv_select.o white_black.o actions.o search.o utilities.o provers.o foffer.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o autosketches4.o autosketches4.c
+gcc  -O -Wall -lm -o autosketches4 autosketches4.o index_lits.o forward_subsume.o demodulate.o pred_elim.o unfold.o semantics.o giv_select.o white_black.o actions.o search.o utilities.o provers.o foffer.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o newauto.o newauto.c
+gcc  -O -Wall -lm -o newauto newauto.o index_lits.o forward_subsume.o demodulate.o pred_elim.o unfold.o semantics.o giv_select.o white_black.o actions.o search.o utilities.o provers.o foffer.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o newsax.o newsax.c
+gcc  -O -Wall -lm -o newsax newsax.o index_lits.o forward_subsume.o demodulate.o pred_elim.o unfold.o semantics.o giv_select.o white_black.o actions.o search.o utilities.o provers.o foffer.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o ladr_to_tptp.o ladr_to_tptp.c
+gcc  -O -Wall -lm -o ladr_to_tptp ladr_to_tptp.o index_lits.o forward_subsume.o demodulate.o pred_elim.o unfold.o semantics.o giv_select.o white_black.o actions.o search.o utilities.o provers.o foffer.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o tptp_to_ladr.o tptp_to_ladr.c
+gcc  -O -Wall -lm -o tptp_to_ladr tptp_to_ladr.o index_lits.o forward_subsume.o demodulate.o pred_elim.o unfold.o semantics.o giv_select.o white_black.o actions.o search.o utilities.o provers.o foffer.o ../ladr/libladr.a
+/bin/cp -p prover9 fof-prover9 autosketches4 newauto newsax ladr_to_tptp tptp_to_ladr ../bin
+/bin/rm -f *.o
+make[1]: Leaving directory `/home/mccune/LADR/provers.src'
+cd apps.src     && make all
+make[1]: Entering directory `/home/mccune/LADR/apps.src'
+cd ../ladr && make libladr.a
+make[2]: Entering directory `/home/mccune/LADR/ladr'
+make[2]: `libladr.a' is up to date.
+make[2]: Leaving directory `/home/mccune/LADR/ladr'
+gcc  -O -Wall   -c -o latfilter.o latfilter.c
+gcc  -O -Wall -o latfilter latfilter.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o olfilter.o olfilter.c
+gcc  -O -Wall -o olfilter olfilter.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o clausefilter.o clausefilter.c
+gcc  -O -Wall -o clausefilter clausefilter.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o idfilter.o idfilter.c
+gcc  -O -Wall -o idfilter idfilter.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o renamer.o renamer.c
+gcc  -O -Wall -o renamer renamer.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o unfast.o unfast.c
+gcc  -O -Wall -o unfast unfast.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o clausetester.o clausetester.c
+gcc  -O -Wall -o clausetester clausetester.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o rewriter.o rewriter.c
+gcc  -O -Wall -o rewriter rewriter.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o isofilter0.o isofilter0.c
+gcc  -O -Wall -o isofilter0 isofilter0.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o isofilter.o isofilter.c
+gcc  -O -Wall -o isofilter isofilter.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o isofilter2.o isofilter2.c
+gcc  -O -Wall -o isofilter2 isofilter2.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o dprofiles.o dprofiles.c
+gcc  -O -Wall -o dprofiles dprofiles.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o interpfilter.o interpfilter.c
+gcc  -O -Wall -o interpfilter interpfilter.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o upper-covers.o upper-covers.c
+gcc  -O -Wall -o upper-covers upper-covers.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o miniscope.o miniscope.c
+gcc  -O -Wall -o miniscope miniscope.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o interpformat.o interpformat.c
+gcc  -O -Wall -o interpformat interpformat.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o prooftrans.o prooftrans.c
+gcc  -O -Wall -o prooftrans prooftrans.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o mirror-flip.o mirror-flip.c
+gcc  -O -Wall -o mirror-flip mirror-flip.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o perm3.o perm3.c
+gcc  -O -Wall -o perm3 perm3.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o sigtest.o sigtest.c
+gcc  -O -Wall -o sigtest sigtest.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o directproof.o directproof.c
+gcc  -O -Wall -o directproof directproof.o ../ladr/libladr.a
+gcc  -O -Wall   -c -o test_clause_eval.o test_clause_eval.c
+gcc  -O -Wall -o test_clause_eval test_clause_eval.o ../ladr/libladr.a
+/bin/mv latfilter olfilter clausefilter idfilter renamer unfast clausetester rewriter isofilter0 isofilter isofilter2 dprofiles interpfilter upper-covers miniscope interpformat prooftrans mirror-flip perm3 sigtest directproof test_clause_eval ../bin
+/bin/rm -f *.o latfilter olfilter clausefilter idfilter renamer unfast clausetester rewriter isofilter0 isofilter isofilter2 dprofiles interpfilter upper-covers miniscope interpformat prooftrans mirror-flip perm3 sigtest directproof test_clause_eval
+make[1]: Leaving directory `/home/mccune/LADR/apps.src'
+/bin/cp -p utilities/* bin
+
+**** Now try 'make test1'. ****
+
